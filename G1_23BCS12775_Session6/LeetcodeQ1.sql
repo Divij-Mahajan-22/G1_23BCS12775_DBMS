@@ -1,25 +1,9 @@
 --G1_23BCS12775_Divij_Mahajan_Session6
-WITH rek AS(
-  SELECT *
-  FROM movierating mr
-  LEFT JOIN users u ON mr.user_id = u.user_id
-  LEFT JOIN movies m ON mr.movie_id = m.movie_id)
-
-, nam AS(
-SELECT rek.name as results
-FROM rek
-GROUP BY rek.name
-order by COUNT(*) DESC, rek.name
-LIMIT 1)
-
-, av AS(
-SELECT rek.title AS results
-FROM rek
-WHERE rek.created_at BETWEEN '2020-02-01' AND '2020-02-28'
-GROUP BY rek.title
-ORDER BY AVG(RATING) DESC, rek.title 
-LIMIT 1)
-
-SELECT * FROM nam
+WITH temp as((SELECT u.name as name, COUNT(mr.rating) as rating FROM Users u LEFT JOIN MovieRating mr ON u.user_id = mr.user_id
+GROUP BY u.name ORDER BY rating DESC, u.name LIMIT 1)
 UNION ALL
-SELECT * FROM av
+(SELECT  m.title as name,AVG(mr.rating) as rating FROM Movies m LEFT JOIN MovieRating mr ON m.movie_id = mr.movie_id
+WHERE mr.created_at BETWEEN '2020-02-01' AND '2020-02-29'
+GROUP BY m.title ORDER BY rating DESC, m.title LIMIT 1))
+
+SELECT name as results FROM temp
